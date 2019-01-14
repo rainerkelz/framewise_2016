@@ -37,7 +37,7 @@ $ python create-non-overlapping-splits.py data/<MAPS-install-directory>/data
 $ mv non-overlapping splits
 ```
 
-- the following call will start training the VGG-style network, and keep track of progress in `<result-directory>
+- the following call will start training the VGG-style network, and keep track of progress in `<result-directory>`
 ```
 $ python train.py splits/non-overlapping runs/<result-directory>
 ```
