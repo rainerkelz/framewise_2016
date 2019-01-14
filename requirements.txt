@@ -1,0 +1,8 @@
+numpy>=1.15.4
+madmom>=0.16.1
+numpy>=0.15.4
+torch==0.4.1
+torchvision==0.2.1
+joblib>=0.13.0
+tensorboardX>=1.6
+scikit-learn>=0.19.1

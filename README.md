@@ -1,11 +1,26 @@
 # Framewise Polyphonic Transcription 2016
 - this repository contains code to reproduce results from a paper about framewise polyphonic piano transcription (https://arxiv.org/abs/1612.05153)
 
-- ported is from theano+lasagne to pytorch 0.4.1
+- the code is ported from theano+lasagne to pytorch 0.4.1
 
-- you'll need python >= 3.5
+- obtain the MAPS dataset (http://www.tsi.telecom-paristech.fr/aao/en/2010/07/08/maps-database-a-piano-database-for-multipitch-estimation-and-automatic-transcription-of-music/)
+
+- clone this repository
+
+- you'll need python >= 3.5, and a CUDA installation if you want to use a GPU
+
+- you don't need to install anything from within this repo, but you'll need to install some required python packages
 ```
 $ pip install -r requirements.txt
+```
+
+- you'll then need to generate the (non-overlapping) splits (called `Configuration II` in the paper)
+```
+$ python 
+
+the following call
+```
+$ python train.py
 ```
 
 Please cite:
