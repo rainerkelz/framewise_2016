@@ -33,13 +33,13 @@ def main():
     # prepare test data as individual sequences
     test_filenames = filenames_from_splitfile(args.splitfile)
 
-    # to get all of the sequence data, just write this:
     start_end = None
     try:
         if args.start_end is not None:
             start_end = tuple(int(t) for t in args.start_end.split(','))
+        print('evaluating on frames {} of the data'.format(start_end))
     except Exception as e:
-        print('ERROR: invalid input for "start_end"!')
+        print('evaluating on ALL the data')
         pass
     test_sequences = datasets.get_sequences(test_filenames, start_end)
 

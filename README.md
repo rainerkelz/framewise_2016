@@ -14,27 +14,56 @@
 $ pip install -r requirements.txt
 ```
 
-- you'll then need to generate the (non-overlapping) splits (called `Configuration II` in the paper), by pointing the helper script to the folder that has the MAPS data:
+- to keep things organized, we'd recommend creating these directories:
 ```
-$ python create-non-overlapping-splits.py <MAPS-install-directory>/data
+$ mkdir data
+$ mkdir splits
+$ mkdir runs
 ```
 
-- this will create a directory `non-overlapping`, containing three textfiles `train`, `valid` and `test`, which contain (audiofile, midifile) pairs
+- link in the MAPS dataset into `data`:
+```
+$ cd data
+$ ln -s <path-to-where-MAPS-was extracted to> .
+```
+
+- you'll then need to generate the (non-overlapping) splits (called `Configuration II` in the paper), by pointing the helper script to the folder that has the MAPS data:
+```
+$ python create-non-overlapping-splits.py data/<MAPS-install-directory>/data
+```
+
+- this will create a directory `non-overlapping`, containing three textfiles `train`, `valid` and `test`, which contain (audiofile, midifile) pairs. you could then move this subdirectory into `splits`:
+```
+$ mv non-overlapping splits
+```
 
 - the following call will start training the VGG-style network, and keep track of progress in `<result-directory>
 ```
-$ python train.py non-overlapping <result-directory>
+$ python train.py splits/non-overlapping runs/<result-directory>
 ```
+
+- calling `train.py` for the first time will take a while, as it has to compute all spectrogram-label pairs from the audiofile and the midifile. the results of these computations are cached via `joblib` in a folder named `joblib_cache`
 
 - you can track progress visually by using tensorboard
 ```
-$ tensorboard --logdir <result-directory>
+$ tensorboard --logdir runs/<result-directory>
 ```
 
 - you can evaluate a network-state by using
 ```
-$ python evaluate.py <result-directory>/best_valid_loss_net_state.pkl <split-directory>
+$ python evaluate.py runs/<result-directory>/best_valid_loss_net_state.pkl splits/non-overlapping/test
 ```
+
+- if you do this for the first time, the spectrogram-label pairs need to be computed. the results of these computations are cached via `joblib` in a folder named `joblib_cache`
+
+- you can choose the amount of frames to evaluate on via `start_end`
+```
+$ python evaluate.py runs/<result-directory>/best_valid_loss_net_state.pkl splits/non-overlapping/test --start_end "<start>,<end>"
+```
+
+- if you enter anything other than "<number>,<number>" for --start_end, the network is evaluated on ALL the data
+
+- there are three network states being tracked, one that tracks the best validation loss, the best validation f-measure, and the current network state. with the hyperparameters chosen as they are, you should see a f-measure of ~0.71 on the first 30[s] of the test-data, after a few thousand updates. if you evaluate on all of the data, f-measure should be around ~0.69.
 
 
 If you use stuff from this repository, please cite:
