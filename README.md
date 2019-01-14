@@ -37,7 +37,7 @@ $ python create-non-overlapping-splits.py data/<MAPS-install-directory>/data
 $ mv non-overlapping splits
 ```
 
-- the following call will start training the VGG-style network, and keep track of progress in `<result-directory>`
+- the following call will start training the VGG-style network, and keep track of progress in `runs/<result-directory>`
 ```
 $ python train.py splits/non-overlapping runs/<result-directory>
 ```
@@ -58,10 +58,12 @@ $ python evaluate.py runs/<result-directory>/best_valid_loss_net_state.pkl split
 
 - you can choose the amount of frames to evaluate on via `start_end`
 ```
-$ python evaluate.py runs/<result-directory>/best_valid_loss_net_state.pkl splits/non-overlapping/test --start_end "<start>,<end>"
+$ python evaluate.py runs/<result-directory>/best_valid_loss_net_state.pkl \
+         splits/non-overlapping/test \
+         --start_end "<start>,<end>"
 ```
 
-- if you enter anything other than "<number>,<number>" for --start_end, the network is evaluated on ALL the data
+- if you enter anything other than `"<number>,<number>"` for --start_end, the network is evaluated on ALL the data
 
 - there are three network states being tracked, one that tracks the best validation loss, the best validation f-measure, and the current network state. with the hyperparameters chosen as they are, you should see a f-measure of ~0.71 on the first 30[s] of the test-data, after a few thousand updates. if you evaluate on all of the data, f-measure should be around ~0.69.
 
