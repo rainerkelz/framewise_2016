@@ -8,7 +8,6 @@ import torch
 from utils import evaluate_multiple_loaders
 from utils import filenames_from_splitfile
 
-import os
 import argparse
 
 
@@ -16,9 +15,9 @@ def main():
     parser = argparse.ArgumentParser(description='train a VGG style conv net on the MAPS dataset')
     parser.add_argument('net_state', type=str,
                         help='which network state to use')
-    parser.add_argument('splits', type=str,
-                        help='splits directory from which the "test" split will be taken')
-    parser.add_argument('--start_end', type=str, default="0,750")
+    parser.add_argument('splitfile', type=str,
+                        help='the list of files that will be evaluated')
+    parser.add_argument('--start_end', type=str, default="0,750", help='start and end frame; the default value boils down to the first 30[s] at a framerate of 25[fps]')
     parser.add_argument('--device', type=str, default='cuda')
     args = parser.parse_args()
 
@@ -31,8 +30,8 @@ def main():
         print('unknown device type "{}"'.format(args.device))
         exit(-1)
 
-    # prepare valid data as individual sequences
-    test_filenames = filenames_from_splitfile(os.path.join(args.splits, 'test'))
+    # prepare test data as individual sequences
+    test_filenames = filenames_from_splitfile(args.splitfile)
 
     # to get all of the sequence data, just write this:
     start_end = None

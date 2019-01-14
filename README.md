@@ -14,16 +14,30 @@
 $ pip install -r requirements.txt
 ```
 
-- you'll then need to generate the (non-overlapping) splits (called `Configuration II` in the paper)
+- you'll then need to generate the (non-overlapping) splits (called `Configuration II` in the paper), by pointing the helper script to the folder that has the MAPS data:
 ```
-$ python 
-
-the following call
-```
-$ python train.py
+$ python create-non-overlapping-splits.py <MAPS-install-directory>/data
 ```
 
-Please cite:
+- this will create a directory `non-overlapping`, containing three textfiles `train`, `valid` and `test`, which contain (audiofile, midifile) pairs
+
+- the following call will start training the VGG-style network, and keep track of progress in `<result-directory>
+```
+$ python train.py non-overlapping <result-directory>
+```
+
+- you can track progress visually by using tensorboard
+```
+$ tensorboard --logdir <result-directory>
+```
+
+- you can evaluate a network-state by using
+```
+$ python evaluate.py <result-directory>/best_valid_loss_net_state.pkl <split-directory>
+```
+
+
+If you use stuff from this repository, please cite:
 ```
 @inproceedings{kelz_etal_2016
   author    = {Rainer Kelz and
