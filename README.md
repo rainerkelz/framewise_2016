@@ -1,9 +1,15 @@
-# framewise_2016
-code to reproduce results from a paper about framewise polyphonic piano transcription (https://arxiv.org/abs/1612.05153)
+# Framewise Polyphonic Transcription 2016
+- this repository contains code to reproduce results from a paper about framewise polyphonic piano transcription (https://arxiv.org/abs/1612.05153)
 
-ported from theano to pytorch 0.4.1
+- ported is from theano+lasagne to pytorch 0.4.1
 
-if you use this, please cite:
+- you'll need python >= 3.5
+```
+$ pip install -r requirements.txt
+```
+
+Please cite:
+```
 @inproceedings{kelz_etal_2016
   author    = {Rainer Kelz and
                Matthias Dorfer and
@@ -18,3 +24,4 @@ if you use this, please cite:
   pages     = {475--481},
   year      = {2016}
 }
+```
