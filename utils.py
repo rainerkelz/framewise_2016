@@ -85,7 +85,7 @@ def train(cuda, run_path, net, optimizer, scheduler, n_epochs, train_loader, val
 
 def train_one_epoch(cuda, net, optimizer, loader):
     net.train()
-    loss_function = nn.BCEWithLogitsLoss(reduction='elementwise_mean')
+    loss_function = nn.BCEWithLogitsLoss(reduction='mean')
     smoothed_loss = 1.
     t_elapsed = 0
     n_batches = float(len(loader))
@@ -124,7 +124,7 @@ def train_one_epoch(cuda, net, optimizer, loader):
 
 def find_learnrate(cuda, net, optimizer, loader):
     net.train()
-    loss_function = nn.BCEWithLogitsLoss(reduction='elementwise_mean')
+    loss_function = nn.BCEWithLogitsLoss(reduction='mean')
 
     t_elapsed = 0
     n_batches = float(len(loader))
@@ -193,7 +193,7 @@ def evaluate_multiple_loaders(cuda, net, loaders):
 
 def evaluate_one_loader(cuda, net, loader):
     net.eval()
-    loss_function = nn.BCELoss(reduction='elementwise_mean')
+    loss_function = nn.BCELoss(reduction='mean')
     smoothed_loss = 1.
     y_true = []
     y_pred = []
