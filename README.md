@@ -1,7 +1,7 @@
 # Framewise Polyphonic Transcription 2016
 - this repository contains code to reproduce results from a paper about framewise polyphonic piano transcription (https://arxiv.org/abs/1612.05153)
 
-- the code is ported from theano+lasagne to pytorch 0.4.1
+- the code is ported from theano+lasagne to pytorch 1.0.0
 
 - obtain the MAPS dataset (http://www.tsi.telecom-paristech.fr/aao/en/2010/07/08/maps-database-a-piano-database-for-multipitch-estimation-and-automatic-transcription-of-music/)
 
@@ -11,7 +11,8 @@
 
 - you don't need to install anything from within this repo, but you'll need to install some required python packages
 ```
-$ pip install -r requirements.txt
+$ pip install -r requirements_00.txt
+$ pip install -r requirements_01.txt
 ```
 
 - to keep things organized, we'd recommend creating these directories:
