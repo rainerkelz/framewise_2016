@@ -2,6 +2,7 @@ import os
 import shutil
 import torch
 from torch import nn
+from torch import optim
 import time
 import numpy as np
 from sklearn.metrics import precision_recall_fscore_support as prfs
@@ -79,7 +80,10 @@ def train(cuda, run_path, net, optimizer, scheduler, n_epochs, train_loader, val
                 )
 
         # step on the validation loss only
-        scheduler.step(valid_loss)
+        if isinstance(scheduler, optim.lr_scheduler.ReduceLROnPlateau):
+            scheduler.step(valid_loss, epoch=epoch)
+        else:
+            scheduler.step(epoch=epoch)
         epoch += 1
 
 

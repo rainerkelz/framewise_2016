@@ -10,20 +10,22 @@ import models
 from utils import ChunkedRandomSampler
 from utils import train
 from utils import ensure_empty_directory_exists, filenames_from_splitfile
-from utils import OneCyclePolicy
+# from utils import OneCyclePolicy
 import os
-
-import numpy as np
 
 import argparse
 
 
 def main():
-    parser = argparse.ArgumentParser(description='train a VGG style conv net on the MAPS dataset')
+    parser = argparse.ArgumentParser(description=
+                                     'train a convolutional network' +
+                                     'on the MAPS dataset')
     parser.add_argument('splits', type=str,
                         help='on which splits to train')
     parser.add_argument('run_path', type=str,
                         help='where to write run state')
+    parser.add_argument('model', choices=models.get_model_classes(),
+                        help='any classname of model as defined in "models.py"')
     parser.add_argument('--device', type=str, default='cuda')
     args = parser.parse_args()
 
@@ -46,10 +48,18 @@ def main():
     train_filenames = filenames_from_splitfile(os.path.join(args.splits, 'train'))
     train_sequences = datasets.get_sequences(train_filenames)
 
-    batch_size = 32
-    n_steps = 8192
-    # one train loader for all train sequences
     train_dataset = ConcatDataset(train_sequences)
+
+    batch_size = 128
+    n_epochs = 500
+
+    # go with the original definition of an 'epoch' (aka the whole dataset ...)
+    # as opposed to 'arbitrary number of steps until we validate'
+    # n_steps = 8192
+    n_steps = len(train_dataset) // batch_size
+    print('adjusted n_steps', n_steps)
+
+    # one train loader for all train sequences
     train_loader = DataLoader(
         train_dataset,
         batch_size=batch_size,
@@ -81,45 +91,47 @@ def main():
     ensure_empty_directory_exists(log_dir)
     logger = SummaryWriter(log_dir=log_dir)
 
-    net = models.VGGNet2016()
+    net_class = getattr(models, args.model, None)
+    if net_class is None:
+        raise RuntimeError('could not find model class named "{}" in "models.py"'.format(
+            args.model
+        ))
 
-    # these would be the OneCyclePolicy learnrate
-    # does not really improve things ...
-
-    # n_ramp_up = n_steps // 2
-    # n_ramp_down = n_steps - n_ramp_up
-    # learnrates = np.hstack([
-    #     np.linspace(0.1, 1.0, n_ramp_up),
-    #     np.linspace(1.0, 0.1, n_ramp_down)
-    # ])
-    # momenta = np.hstack([
-    #     np.linspace(0.999, 0.01, n_ramp_up),
-    #     np.linspace(0.01, 0.999, n_ramp_down),
-    # ])
-    # print('n_steps', n_steps)
-    # print('len(learnrates)', len(learnrates))
-
-    # optimizer = OneCyclePolicy(
-    #     net.parameters(),
-    #     learnrates=learnrates,
-    #     momenta=momenta,
-    #     nesterov=True
-    # )
-
-    # this leads to the results from 2016 in ~5 epochs
-    optimizer = optim.SGD(
-        net.parameters(),
-        lr=0.25,
-        momentum=0.9,
-        weight_decay=1e-6, nesterov=True
-    )
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer,
-        mode='min',
-        factor=0.5,
-        patience=20,
-        verbose=True
-    )
+    net = net_class()
+    if args.model == 'AllConv2016':
+        print('choosing AllConv2016 learnrate and learnrate schedule!')
+        # this does not train all that well ... validation loss stays high all the time?
+        optimizer = optim.SGD(
+            net.parameters(),
+            lr=1.0,
+            momentum=0.9,
+            weight_decay=1e-5,
+            nesterov=False
+        )
+        milestones = list(range(10, n_epochs, 10))
+        scheduler = optim.lr_scheduler.MultiStepLR(
+            optimizer,
+            milestones,
+            gamma=0.5
+        )
+    else:
+        print('choosing VGGNet2016 learnrate and learnrate schedule!')
+        # this leads to the results from 2016 in ~5 epochs
+        optimizer = optim.SGD(
+            net.parameters(),
+            lr=0.1,
+            momentum=0.9,
+            weight_decay=1e-5,
+            nesterov=False
+        )
+        scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+            optimizer,
+            mode='min',
+            factor=0.5,
+            patience=20,
+            verbose=True,
+            min_lr=1e-4
+        )
 
     if cuda:
         net.cuda()
@@ -130,7 +142,7 @@ def main():
         net=net,
         optimizer=optimizer,
         scheduler=scheduler,
-        n_epochs=500,
+        n_epochs=n_epochs,
         train_loader=train_loader,
         valid_loader=valid_loaders,
         logger=logger

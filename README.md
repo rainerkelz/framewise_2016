@@ -15,6 +15,7 @@ $ pip install -r requirements_00.txt
 $ pip install -r requirements_01.txt
 ```
 
+## Data and Split Preparation
 - to keep things organized, we'd recommend creating these directories:
 ```
 $ mkdir data
@@ -28,34 +29,41 @@ $ cd data
 $ ln -s <path-to-where-MAPS-was extracted to> .
 ```
 
-- you'll then need to generate the (non-overlapping) splits (called `Configuration II` in the paper), by pointing the helper script to the folder that has the MAPS data:
+- you'll then need to generate the (partially musically overlapping) splits (called `Configuration II` in the paper), by pointing the helper script to the folder that has the MAPS data
 ```
-$ python create-non-overlapping-splits.py data/<MAPS-install-directory>/data
-```
-
-- this will create a directory `non-overlapping`, containing three textfiles `train`, `valid` and `test`, which contain (audiofile, midifile) pairs. you could then move this subdirectory into `splits`:
-```
-$ mv non-overlapping splits
+$ python create-configuration-II-splits.py data/<MAPS-install-directory>/data
 ```
 
-- the following call will start training the VGG-style network, and keep track of progress in `runs/<result-directory>`
+- this will create a directory `configuration-II`, containing three textfiles `train`, `valid` and `test`, which contain (audiofile, midifile) pairs. you could then move this subdirectory into `splits`:
 ```
-$ python train.py splits/non-overlapping runs/<result-directory>
+$ mv configuration-II splits
+```
+
+## Training
+- the following call will start training the VGG-style network, and keep track of progress in `runs/<vgg-result-directory>`
+```
+$ python train.py splits/configuration-II/ runs/<vgg-result-directory> VGGNet2016
+```
+
+- the following call will start training the all-convolutional network, and keep track of progress in `runs/<allconv-result-directory>`
+```
+$ python train.py splits/configuration-II/ runs/<allconv-result-directory> AllConv2016
 ```
 
 - calling `train.py` for the first time will take a while, as it has to compute all spectrogram-label pairs from the audiofile and the midifile. the results of these computations are cached via `joblib` in a folder named `joblib_cache`
 
-- you can track progress visually by using tensorboard
+- you can track training progress visually by using tensorboard
 ```
 $ tensorboard --logdir runs/<result-directory>
 ```
 
+## Evaluation
 - you can evaluate a network-state by using
 ```
 $ python evaluate.py runs/<result-directory>/best_valid_loss_net_state.pkl splits/non-overlapping/test
 ```
 
-- if you do this for the first time, the spectrogram-label pairs need to be computed. the results of these computations are cached via `joblib` in a folder named `joblib_cache`
+- if you evaluate for the first time, the spectrogram-label pairs for the test set need to be computed. the results of these computations are cached via `joblib` in a folder named `joblib_cache`
 
 - you can choose the amount of frames to evaluate on via `start_end`
 ```
@@ -66,9 +74,27 @@ $ python evaluate.py runs/<result-directory>/best_valid_loss_net_state.pkl \
 
 - if you enter anything other than `"<number>,<number>"` for --start_end, the network is evaluated on ALL the data
 
-- there are three network states being tracked, one that tracks the best validation loss, the best validation f-measure, and the current network state. with the hyperparameters chosen as they are, you should see a f-measure of ~0.71 on the first 30[s] of the test-data, after a few thousand updates. if you evaluate on all of the data, f-measure should be around ~0.69.
+- there are three network states being tracked, one that tracks the best validation loss, the best validation f-measure, and the current network state.
+
+- with the hyperparameters chosen as close as possible to those used for the original code in theano+lasagne, you should see approximately the following results after ~140 epochs:
+
+- Results on the **first 30[s]** of the pieces in the `Configuration II` test set:
+  (this is **the same** evaluation protocol as in the paper from 2016 (as well as in Sigtia'16)!)
+| Model        | Precision | Recall | F-Measure |
+|:------------ | ---------:| ------:| ---------:|
+| VGGnet2016   |  0.8045   | 0.7084 |  0.7476   |
+| AllConv2016  |  0.8255   | 0.6399 |  0.7142   |
 
 
+- Results on the **full length** of the pieces in the `Configuration II` test set:
+  (this is **different** from the evaluation protocol in the paper from 2016!)
+| Model        | Precision | Recall | F-Measure |
+|:------------ | ---------:| ------:| ---------:|
+| VGGnet2016   | 0.7806    | 0.6664 |  0.7139   |
+| AllConv2016  | 0.8060    | 0.6036 |  0.6854   |
+
+
+## Credit Assignment (pun wholeheartedly intended)
 If you use stuff from this repository, please cite:
 ```
 @inproceedings{kelz_etal_2016

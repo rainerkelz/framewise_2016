@@ -12,7 +12,9 @@ import argparse
 
 
 def main():
-    parser = argparse.ArgumentParser(description='train a VGG style conv net on the MAPS dataset')
+    parser = argparse.ArgumentParser(description='evaluate a convolutional network on the MAPS dataset')
+    parser.add_argument('model', choices=models.get_model_classes(),
+                        help='any classname of model as defined in "models.py"')
     parser.add_argument('net_state', type=str,
                         help='which network state to use')
     parser.add_argument('splitfile', type=str,
@@ -36,13 +38,22 @@ def main():
     start_end = None
     try:
         if args.start_end is not None:
-            start_end = tuple(int(t) for t in args.start_end.split(','))
-        print('evaluating on frames {} of the data'.format(start_end))
+            start, end = tuple(int(t) for t in args.start_end.split(','))
+            duration = end - start
+            if duration <= 0:
+                raise ValueError('negative durations are unacceptable ...')
+            duration_in_s = float(duration) / 25.
+        print('evaluating on frames {} of the data ({} [s])'.format((start, end), duration_in_s))
+        start_end = (start, end)
+        if abs(duration_in_s - 30.) < 0.5:
+            print('using the SAME evaluation protocol (as in the paper)')
+        else:
+            print('using a DIFFERENT evalution protocol (not as in the paper)')
     except Exception as e:
         print('evaluating on ALL the data')
-        pass
-    test_sequences = datasets.get_sequences(test_filenames, start_end)
+        print('using a DIFFERENT evalution protocol (not as in the paper)')
 
+    test_sequences = datasets.get_sequences(test_filenames, start_end)
     test_loaders = []
     for test_sequence in test_sequences:
         test_loader = DataLoader(
@@ -55,7 +66,11 @@ def main():
         )
         test_loaders.append(test_loader)
 
-    net = models.VGGNet2016()
+    net_class = getattr(models, args.model, None)
+    if net_class is None:
+        raise RuntimeError('could not find model class named "{}" in "models.py"'.format(args.model))
+
+    net = net_class()
     net.load_state_dict(torch.load(args.net_state))
 
     if cuda:
