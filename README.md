@@ -58,9 +58,14 @@ $ tensorboard --logdir runs/<result-directory>
 ```
 
 ## Evaluation
-- you can evaluate a network-state by using
+- you can evaluate a VGGNet2016 network-state by using
 ```
-$ python evaluate.py runs/<result-directory>/best_valid_loss_net_state.pkl splits/non-overlapping/test
+$ python evaluate.py VGGNet2016 runs/<vgg-result-directory>/best_valid_loss_net_state.pkl splits/configuration-II/test
+```
+
+- you can evaluate an AllConv2016 network-state by using
+```
+$ python evaluate.py AllConv2016 runs/<allconv-result-directory>/best_valid_loss_net_state.pkl splits/configuration-II/test
 ```
 
 - if you evaluate for the first time, the spectrogram-label pairs for the test set need to be computed. the results of these computations are cached via `joblib` in a folder named `joblib_cache`
@@ -68,7 +73,7 @@ $ python evaluate.py runs/<result-directory>/best_valid_loss_net_state.pkl split
 - you can choose the amount of frames to evaluate on via `start_end`
 ```
 $ python evaluate.py runs/<result-directory>/best_valid_loss_net_state.pkl \
-         splits/non-overlapping/test \
+         splits/configuration-II/test \
          --start_end "<start>,<end>"
 ```
 
@@ -80,16 +85,18 @@ $ python evaluate.py runs/<result-directory>/best_valid_loss_net_state.pkl \
 
 - Results on the **first 30[s]** of the pieces in the `Configuration II` test set:
   (this is **the same** evaluation protocol as in the paper from 2016 (as well as in Sigtia'16)!)
+
 | Model        | Precision | Recall | F-Measure |
-|:------------ | ---------:| ------:| ---------:|
+| ------------ | ---------:| ------:| ---------:|
 | VGGnet2016   |  0.8045   | 0.7084 |  0.7476   |
 | AllConv2016  |  0.8255   | 0.6399 |  0.7142   |
 
 
 - Results on the **full length** of the pieces in the `Configuration II` test set:
   (this is **different** from the evaluation protocol in the paper from 2016!)
+
 | Model        | Precision | Recall | F-Measure |
-|:------------ | ---------:| ------:| ---------:|
+| ------------ | ---------:| ------:| ---------:|
 | VGGnet2016   | 0.7806    | 0.6664 |  0.7139   |
 | AllConv2016  | 0.8060    | 0.6036 |  0.6854   |
 
