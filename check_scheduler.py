@@ -84,7 +84,8 @@ def main():
     ax.plot(lrs_multi, label='lrs_multi')
     ax.legend()
 
-    plt.show()
+    fig.savefig('check_scheduler.png', dpi=300, bbox_inches='tight')
+    plt.close(fig)
 
 
 if __name__ == '__main__':
