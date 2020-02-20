@@ -107,7 +107,7 @@ $ python evaluate.py runs/<result-directory>/best_valid_loss_net_state.pkl \
 $ python check_cheduler.py
 ```
 - the result should look something like this:
-![expected result](./blob/master/check_cheduler.png)
+![expected result](./master/check_cheduler.png)
 
 
 ## Credit Assignment (pun wholeheartedly intended)
