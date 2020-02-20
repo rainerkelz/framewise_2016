@@ -101,6 +101,15 @@ $ python evaluate.py runs/<result-directory>/best_valid_loss_net_state.pkl \
 | AllConv2016  | 0.8060    | 0.6036 |  0.6854   |
 
 
+## Scheduler Behavior
+- if your learnrate schedules are wonky, please execute
+```
+$ python check_cheduler.py
+```
+- the result should look something like this:
+![expected result](../blob/master/check_cheduler.png)
+
+
 ## Credit Assignment (pun wholeheartedly intended)
 If you use stuff from this repository, please cite:
 ```
