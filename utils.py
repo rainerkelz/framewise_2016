@@ -58,10 +58,12 @@ def train(cuda, run_path, net, optimizer, scheduler, n_epochs, train_loader, val
 
         # save net state when we get better validation loss
         if valid_loss < best_valid_loss:
+            best_valid_loss = valid_loss
             torch.save(net.state_dict(), best_valid_loss_net_filename)
 
         # save net state when we get better validation f-measure
         if f > best_valid_f:
+            best_valid_f = f
             torch.save(net.state_dict(), best_valid_f_net_filename)
 
         # always recorded, if present, to keep track of lr-scheduler
